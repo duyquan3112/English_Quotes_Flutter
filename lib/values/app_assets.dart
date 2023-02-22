@@ -8,4 +8,5 @@ class AppAssets {
   static final String left_Arrow = imgPath + 'left-arrow.png';
   static final String right_Arrow = imgPath + 'right-arrow.png';
   static final String heart = imgPath + 'heart.png';
+  static final String menu = imgPath + 'menu.png';
 }
