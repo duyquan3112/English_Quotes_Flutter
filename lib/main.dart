@@ -1,9 +1,11 @@
+import 'package:english_quotes/package/quotes/quote.dart';
 import 'package:english_quotes/pages/landing_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-void main() {
-  
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Quotes().getAll();
   runApp(const MyApp());
 }
 

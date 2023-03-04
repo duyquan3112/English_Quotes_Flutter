@@ -1,6 +1,7 @@
 import 'dart:math';
 
-
+import 'package:english_quotes/package/quotes/quote.dart';
+import 'package:english_quotes/package/quotes/quote_model.dart';
 import 'package:english_words/english_words.dart';
 import 'package:english_quotes/models/english_today.dart';
 import 'package:english_quotes/values/app_assets.dart';
@@ -9,7 +10,6 @@ import 'package:english_quotes/values/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
-
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,8 +23,10 @@ class _HomePageState extends State<HomePage> {
   late PageController _pageController;
 
   List<EnglishToday> words = [];
-  
-  List<int> fixedListRandom({int len = 1, int max = 120, int min = 1}){
+
+  String headerQuote = Quotes().getRandom().content!;
+
+  List<int> fixedListRandom({int len = 1, int max = 120, int min = 1}) {
     if (len > max || len < min) {
       return [];
     }
@@ -34,9 +36,9 @@ class _HomePageState extends State<HomePage> {
     Random random = Random();
 
     int count = 1;
-    while(count <= len){
+    while (count <= len) {
       int val = random.nextInt(max);
-      if (newList.contains(val)){
+      if (newList.contains(val)) {
         continue;
       } else {
         newList.add(val);
@@ -46,17 +48,24 @@ class _HomePageState extends State<HomePage> {
     return newList;
   }
 
-  getEnglishToday(){
+  getEnglishToday() {
     List<String> newList = [];
     List<int> rans = fixedListRandom(len: 5, max: nouns.length);
     rans.forEach((index) {
       newList.add(nouns[index]);
-     });
-     words = newList.map((e) => EnglishToday(
-      noun: e,
-     )).toList();
+    });
+    words = newList.map((e) => getQuote(e)).toList();
   }
 
+  EnglishToday getQuote(String noun) {
+    Quote? quote;
+    quote = Quotes().getByWord(noun);
+    return EnglishToday(
+      noun: noun,
+      quote: quote?.content,
+      id: quote?.id,
+    );
+  }
 
   @override
   void initState() {
@@ -95,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                 height: size.height * 1 / 10,
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '"Insanity is doing the same thing, over and over again, but expecting different results."',
+                  '"$headerQuote"',
                   style: AppStyles.h5.copyWith(color: AppColors.blackGrey),
                 )),
             Container(
@@ -110,10 +119,14 @@ class _HomePageState extends State<HomePage> {
                   },
                   itemCount: words.length,
                   itemBuilder: (context, index) {
-
                     String letter = (words[index].noun ?? ' ');
                     String firstLetter = letter.substring(0, 1);
                     String restLetter = letter.substring(1, letter.length);
+                    String quoteDefault =
+                        'The best and most beautiful things in the world cannot be seen or even touched - they must be felt with the heart.';
+                    String quote = words[index].quote != null
+                        ? words[index].quote!
+                        : quoteDefault;
 
                     return Padding(
                       padding: const EdgeInsets.all(8),
@@ -173,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                             Padding(
                                 padding: const EdgeInsets.only(top: 30),
                                 child: Text(
-                                  '"The best and most beautiful things in the world cannot be seen or even touched - they must be felt with the heart."',
+                                  '"$quote"',
                                   style: AppStyles.h4.copyWith(
                                       color: AppColors.blackGrey,
                                       letterSpacing: 1.2),
@@ -209,7 +222,9 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryColor,
         onPressed: () {
-          print('clicked');
+          setState(() {
+            getEnglishToday();
+          });
         },
         child: Image.asset(
           AppAssets.reload,
