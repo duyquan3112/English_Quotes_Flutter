@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:english_quotes/package/quotes/quote.dart';
 import 'package:english_quotes/package/quotes/quote_model.dart';
+import 'package:english_quotes/pages/control_page.dart';
+import 'package:english_quotes/widgets/app_button.dart';
 import 'package:english_words/english_words.dart';
 import 'package:english_quotes/models/english_today.dart';
 import 'package:english_quotes/values/app_assets.dart';
@@ -67,6 +69,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     _pageController = PageController(viewportFraction: 0.9);
@@ -78,6 +82,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.lightBlue,
       appBar: AppBar(
         elevation: 0,
@@ -88,7 +93,9 @@ class _HomePageState extends State<HomePage> {
               AppStyles.h3.copyWith(color: AppColors.textColor, fontSize: 40),
         ),
         leading: InkWell(
-          onTap: () {},
+          onTap: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
           child: Image.asset(
             AppAssets.menu,
             scale: 1,
@@ -229,6 +236,41 @@ class _HomePageState extends State<HomePage> {
         child: Image.asset(
           AppAssets.reload,
           scale: 1,
+        ),
+      ),
+      drawer: Drawer(
+        child: Container(
+          color: AppColors.lightBlue,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 26, horizontal: 24),
+                child: Text(
+                  'Your mind',
+                  style: (AppStyles.h3.copyWith(color: AppColors.textColor)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 24),
+                child: AppButton(
+                    label: 'Favorites',
+                    onTap: () {
+                      print('fav');
+                    }),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 24),
+                child: AppButton(
+                    label: 'Your Control',
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => ControlPage()));
+                    }),
+              ),
+            ],
+          ),
         ),
       ),
     );
