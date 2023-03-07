@@ -64,6 +64,7 @@ class _ControlPageState extends State<ControlPage> {
                 inactiveColor: AppColors.primaryColor,
                 onChanged: (value) {
                   print(sliderValue);
+                  print(value);
                   setState(() {
                     sliderValue = value;
                   });
