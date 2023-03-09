@@ -1,8 +1,10 @@
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:english_quotes/package/quotes/quote.dart';
 import 'package:english_quotes/package/quotes/quote_model.dart';
 import 'package:english_quotes/pages/control_page.dart';
+import 'package:english_quotes/values/share_keys.dart';
 import 'package:english_quotes/widgets/app_button.dart';
 import 'package:english_words/english_words.dart';
 import 'package:english_quotes/models/english_today.dart';
@@ -12,6 +14,7 @@ import 'package:english_quotes/values/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -50,13 +53,21 @@ class _HomePageState extends State<HomePage> {
     return newList;
   }
 
-  getEnglishToday() {
+  getEnglishToday() async {
+    print('before');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print('after');
+    int len = prefs.getInt(ShareKeys.counter) ?? 5;
     List<String> newList = [];
-    List<int> rans = fixedListRandom(len: 5, max: nouns.length);
+    List<int> rans = fixedListRandom(len: len, max: nouns.length);
     rans.forEach((index) {
       newList.add(nouns[index]);
     });
-    words = newList.map((e) => getQuote(e)).toList();
+    print('has data');
+    setState(() {
+      print('rendered');
+      words = newList.map((e) => getQuote(e)).toList();
+    });
   }
 
   EnglishToday getQuote(String noun) {
@@ -158,17 +169,18 @@ class _HomePageState extends State<HomePage> {
                                   AppAssets.heart,
                                   color: Colors.white,
                                 )),
-                            RichText(
+                            AutoSizeText.rich(
                               maxLines: 1, //gioi han khong cho chu xuong dong
                               overflow:
                                   TextOverflow.ellipsis, //hieu ung gioi han chu
                               textAlign: TextAlign.start,
-                              text: TextSpan(
+                              TextSpan(
                                   text: firstLetter,
                                   style: TextStyle(
                                       fontFamily: fontFamily.Inter,
                                       fontSize: 100,
                                       fontWeight: FontWeight.bold,
+                                      color: Colors.white,
                                       shadows: [
                                         BoxShadow(
                                           color: Colors.black38,
@@ -192,8 +204,9 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Padding(
                                 padding: const EdgeInsets.only(top: 30),
-                                child: Text(
+                                child: AutoSizeText(
                                   '"$quote"',
+                                  maxFontSize: 26,
                                   style: AppStyles.h4.copyWith(
                                       color: AppColors.blackGrey,
                                       letterSpacing: 1.2),
@@ -264,9 +277,12 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.only(top: 24),
                 child: AppButton(
                     label: 'Your Control',
-                    onTap: () {
-                      Navigator.push(context,
+                    onTap: () async {
+                      await Navigator.push(context,
                           MaterialPageRoute(builder: (_) => ControlPage()));
+                      setState(() {
+                        getEnglishToday();
+                      });
                     }),
               ),
             ],
