@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:english_quotes/package/quotes/quote.dart';
 import 'package:english_quotes/package/quotes/quote_model.dart';
+import 'package:english_quotes/pages/all_words_page.dart';
 import 'package:english_quotes/pages/control_page.dart';
 import 'package:english_quotes/values/share_keys.dart';
 import 'package:english_quotes/widgets/app_button.dart';
@@ -146,6 +147,7 @@ class _HomePageState extends State<HomePage> {
                         ? words[index].quote!
                         : quoteDefault;
 
+                    ///return card
                     return Padding(
                       padding: const EdgeInsets.all(8),
                       child: Container(
@@ -219,23 +221,25 @@ class _HomePageState extends State<HomePage> {
             ),
 
             /// Render Indicator
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 26),
-              child: SizedBox(
-                height: size.height * 1 / 11,
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: words.length,
-                      itemBuilder: (context, index) {
-                        return buildIndicator(index == _currentIndex, size);
-                      }),
-                ),
-              ),
-            )
+            _currentIndex >= 5
+                ? buildShowmore()
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 26),
+                    child: SizedBox(
+                      height: size.height * 1 / 11,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            itemCount: words.length,
+                            itemBuilder: (context, index) {
+                              return buildIndicator(
+                                  index == _currentIndex, size);
+                            }),
+                      ),
+                    ),
+                  )
           ],
         ),
       ),
@@ -280,6 +284,8 @@ class _HomePageState extends State<HomePage> {
                     onTap: () async {
                       await Navigator.push(context,
                           MaterialPageRoute(builder: (_) => ControlPage()));
+
+                      ///Auto reload when changed number of words
                       setState(() {
                         getEnglishToday();
                       });
@@ -293,7 +299,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildIndicator(bool isActive, Size size) {
-    return Container(
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      curve: Curves.decelerate,
       margin: const EdgeInsets.all(16),
       width: isActive ? size.width * 1 / 5 : 24,
       decoration: BoxDecoration(
@@ -303,6 +311,35 @@ class _HomePageState extends State<HomePage> {
             BoxShadow(
                 color: Colors.black38, offset: Offset(2, 3), blurRadius: 3)
           ]),
+    );
+  }
+
+  Widget buildShowmore() {
+    return Container(
+      alignment: Alignment.centerLeft,
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Material(
+          color: AppColors.primaryColor,
+          elevation: 4,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            splashColor: AppColors.lightBlue,
+            borderRadius: BorderRadius.circular(16),
+            onTap: () {
+              print('show more');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => AllWordsPage(words: words)));
+            },
+            child: Container(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Show More',
+                style: AppStyles.h5,
+              ),
+            ),
+          )),
     );
   }
 }
