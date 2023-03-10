@@ -150,70 +150,89 @@ class _HomePageState extends State<HomePage> {
                     ///return card
                     return Padding(
                       padding: const EdgeInsets.all(8),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                            color: AppColors.primaryColor,
-                            borderRadius: BorderRadius.all(Radius.circular(24)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                offset: Offset(3, 5),
-                                blurRadius: 6,
-                              )
-                            ]),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                                alignment: Alignment.centerRight,
-                                child: Image.asset(
-                                  AppAssets.heart,
-                                  color: Colors.white,
-                                )),
-                            AutoSizeText.rich(
-                              maxLines: 1, //gioi han khong cho chu xuong dong
-                              overflow:
-                                  TextOverflow.ellipsis, //hieu ung gioi han chu
-                              textAlign: TextAlign.start,
-                              TextSpan(
-                                  text: firstLetter,
-                                  style: TextStyle(
-                                      fontFamily: fontFamily.Inter,
-                                      fontSize: 100,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      shadows: [
-                                        BoxShadow(
-                                          color: Colors.black38,
-                                          offset: Offset(3, 6),
-                                          blurRadius: 6,
-                                        )
+                      child: Material(
+                        borderRadius: BorderRadius.all(Radius.circular(24)),
+                        color: AppColors.primaryColor,
+                        elevation: 4,
+                        child: InkWell(
+                          borderRadius: BorderRadius.all(Radius.circular(24)),
+                          onDoubleTap: () {
+                            setState(() {
+                              words[index].isFavorite =
+                                  !words[index].isFavorite;
+                            });
+                          },
+                          splashColor: AppColors.lightBlue,
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            // decoration: BoxDecoration(
+                            //     // color: AppColors.primaryColor,
+                            //     // borderRadius:
+                            //     //     BorderRadius.all(Radius.circular(24)),
+                            //     boxShadow: [
+                            //       BoxShadow(
+                            //         color: Colors.black26,
+                            //         offset: Offset(3, 5),
+                            //         blurRadius: 6,
+                            //       )
+                            //     ]),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                    alignment: Alignment.centerRight,
+                                    child: Image.asset(
+                                      AppAssets.heart,
+                                      color: words[index].isFavorite
+                                          ? Colors.red
+                                          : Colors.white,
+                                    )),
+                                AutoSizeText.rich(
+                                  maxLines:
+                                      1, //gioi han khong cho chu xuong dong
+                                  overflow: TextOverflow
+                                      .ellipsis, //hieu ung gioi han chu
+                                  textAlign: TextAlign.start,
+                                  TextSpan(
+                                      text: firstLetter,
+                                      style: TextStyle(
+                                          fontFamily: fontFamily.Inter,
+                                          fontSize: 100,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          shadows: [
+                                            BoxShadow(
+                                              color: Colors.black38,
+                                              offset: Offset(3, 6),
+                                              blurRadius: 6,
+                                            )
+                                          ]),
+                                      children: [
+                                        TextSpan(
+                                            text: restLetter,
+                                            style: TextStyle(
+                                                fontFamily: fontFamily.Inter,
+                                                fontSize: 64,
+                                                fontWeight: FontWeight.normal,
+                                                shadows: [
+                                                  BoxShadow(
+                                                    color: Colors.transparent,
+                                                  )
+                                                ]))
                                       ]),
-                                  children: [
-                                    TextSpan(
-                                        text: restLetter,
-                                        style: TextStyle(
-                                            fontFamily: fontFamily.Inter,
-                                            fontSize: 64,
-                                            fontWeight: FontWeight.normal,
-                                            shadows: [
-                                              BoxShadow(
-                                                color: Colors.transparent,
-                                              )
-                                            ]))
-                                  ]),
+                                ),
+                                Padding(
+                                    padding: const EdgeInsets.only(top: 30),
+                                    child: AutoSizeText(
+                                      '"$quote"',
+                                      maxFontSize: 26,
+                                      style: AppStyles.h4.copyWith(
+                                          color: AppColors.blackGrey,
+                                          letterSpacing: 1.2),
+                                    ))
+                              ],
                             ),
-                            Padding(
-                                padding: const EdgeInsets.only(top: 30),
-                                child: AutoSizeText(
-                                  '"$quote"',
-                                  maxFontSize: 26,
-                                  style: AppStyles.h4.copyWith(
-                                      color: AppColors.blackGrey,
-                                      letterSpacing: 1.2),
-                                ))
-                          ],
+                          ),
                         ),
                       ),
                     );
