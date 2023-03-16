@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:english_quotes/package/quotes/quote.dart';
 import 'package:english_quotes/package/quotes/quote_model.dart';
+import 'package:english_quotes/pages/all_word_page_v2.dart';
 import 'package:english_quotes/pages/all_words_page.dart';
 import 'package:english_quotes/pages/control_page.dart';
 import 'package:english_quotes/values/share_keys.dart';
@@ -136,7 +137,10 @@ class _HomePageState extends State<HomePage> {
                       _currentIndex = index;
                     });
                   },
-                  itemCount: words.length,
+                  itemCount: words.length > 5
+                      ? 6
+                      : words
+                          .length, //set dieu kien de chi hien 1 blank pageview
                   itemBuilder: (context, index) {
                     String letter = (words[index].noun ?? ' ');
                     String firstLetter = letter.substring(0, 1);
@@ -148,91 +152,140 @@ class _HomePageState extends State<HomePage> {
                         : quoteDefault;
 
                     ///return card
-                    return Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Material(
-                        borderRadius: BorderRadius.all(Radius.circular(24)),
-                        color: AppColors.primaryColor,
-                        elevation: 4,
-                        child: InkWell(
+                    return AnimatedContainer(
+                      duration: const Duration(microseconds: 500),
+                      curve: Curves.decelerate,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Material(
                           borderRadius: BorderRadius.all(Radius.circular(24)),
-                          onDoubleTap: () {
-                            setState(() {
-                              words[index].isFavorite =
-                                  !words[index].isFavorite;
-                            });
-                          },
-                          splashColor: AppColors.lightBlue,
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            // decoration: BoxDecoration(
-                            //     // color: AppColors.primaryColor,
-                            //     // borderRadius:
-                            //     //     BorderRadius.all(Radius.circular(24)),
-                            //     boxShadow: [
-                            //       BoxShadow(
-                            //         color: Colors.black26,
-                            //         offset: Offset(3, 5),
-                            //         blurRadius: 6,
-                            //       )
-                            //     ]),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                    alignment: Alignment.centerRight,
-                                    child: Image.asset(
-                                      AppAssets.heart,
-                                      color: words[index].isFavorite
-                                          ? Colors.red
-                                          : Colors.white,
-                                    )),
-                                AutoSizeText.rich(
-                                  maxLines:
-                                      1, //gioi han khong cho chu xuong dong
-                                  overflow: TextOverflow
-                                      .ellipsis, //hieu ung gioi han chu
-                                  textAlign: TextAlign.start,
-                                  TextSpan(
-                                      text: firstLetter,
-                                      style: TextStyle(
-                                          fontFamily: fontFamily.Inter,
-                                          fontSize: 100,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          shadows: [
-                                            BoxShadow(
-                                              color: Colors.black38,
-                                              offset: Offset(3, 6),
-                                              blurRadius: 6,
-                                            )
-                                          ]),
+                          color: AppColors.primaryColor,
+                          elevation: 4,
+                          child: index >=
+                                  5 //set dieu kien de render pageview showmore
+                              ? InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) =>
+                                                //AllWordsPage(words: words)
+                                                AllWordsPageVer2(
+                                                    words: words)));
+                                  },
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(24)),
+                                  splashColor: AppColors.lightBlue,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12),
+                                    child: Center(
+                                      child: AutoSizeText(
+                                        'Tap for show more...',
+                                        style: AppStyles.h3.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            shadows: [
+                                              BoxShadow(
+                                                color: Colors.black38,
+                                                offset: Offset(3, 4),
+                                                blurRadius: 6,
+                                              )
+                                            ]),
+                                        minFontSize: 12,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : InkWell(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(24)),
+                                  onDoubleTap: () {
+                                    setState(() {
+                                      words[index].isFavorite =
+                                          !words[index].isFavorite;
+                                    });
+                                  },
+                                  splashColor: AppColors.lightBlue,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    // decoration: BoxDecoration(
+                                    //     // color: AppColors.primaryColor,
+                                    //     // borderRadius:
+                                    //     //     BorderRadius.all(Radius.circular(24)),
+                                    //     boxShadow: [
+                                    //       BoxShadow(
+                                    //         color: Colors.black26,
+                                    //         offset: Offset(3, 5),
+                                    //         blurRadius: 6,
+                                    //       )
+                                    //     ]),
+
+                                    ///content of pageviews
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        TextSpan(
-                                            text: restLetter,
-                                            style: TextStyle(
-                                                fontFamily: fontFamily.Inter,
-                                                fontSize: 64,
-                                                fontWeight: FontWeight.normal,
-                                                shadows: [
-                                                  BoxShadow(
-                                                    color: Colors.transparent,
-                                                  )
-                                                ]))
-                                      ]),
+                                        Container(
+                                            alignment: Alignment.centerRight,
+                                            child: Image.asset(
+                                              AppAssets.heart,
+                                              color: words[index].isFavorite
+                                                  ? Colors.red
+                                                  : Colors.white,
+                                            )),
+                                        AutoSizeText.rich(
+                                          maxLines:
+                                              1, //gioi han khong cho chu xuong dong
+                                          overflow: TextOverflow
+                                              .ellipsis, //hieu ung gioi han chu
+                                          textAlign: TextAlign.start,
+                                          TextSpan(
+                                              text: firstLetter,
+                                              style: TextStyle(
+                                                  fontFamily: fontFamily.Inter,
+                                                  fontSize: 100,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  shadows: [
+                                                    BoxShadow(
+                                                      color: Colors.black38,
+                                                      offset: Offset(3, 6),
+                                                      blurRadius: 6,
+                                                    )
+                                                  ]),
+                                              children: [
+                                                TextSpan(
+                                                    text: restLetter,
+                                                    style: TextStyle(
+                                                        fontFamily:
+                                                            fontFamily.Inter,
+                                                        fontSize: 64,
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        shadows: [
+                                                          BoxShadow(
+                                                            color: Colors
+                                                                .transparent,
+                                                          )
+                                                        ]))
+                                              ]),
+                                        ),
+                                        Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 30),
+                                            child: AutoSizeText(
+                                              '"$quote"',
+                                              maxFontSize: 26,
+                                              style: AppStyles.h4.copyWith(
+                                                  color: AppColors.blackGrey,
+                                                  letterSpacing: 1.2),
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                                Padding(
-                                    padding: const EdgeInsets.only(top: 30),
-                                    child: AutoSizeText(
-                                      '"$quote"',
-                                      maxFontSize: 26,
-                                      style: AppStyles.h4.copyWith(
-                                          color: AppColors.blackGrey,
-                                          letterSpacing: 1.2),
-                                    ))
-                              ],
-                            ),
-                          ),
                         ),
                       ),
                     );
@@ -240,25 +293,25 @@ class _HomePageState extends State<HomePage> {
             ),
 
             /// Render Indicator
-            _currentIndex >= 5
-                ? buildShowmore()
-                : Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 26),
-                    child: SizedBox(
-                      height: size.height * 1 / 11,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: words.length,
-                            itemBuilder: (context, index) {
-                              return buildIndicator(
-                                  index == _currentIndex, size);
-                            }),
-                      ),
-                    ),
-                  )
+            // Show more
+            // _currentIndex >= 5
+            //     ? buildShowmore():
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: SizedBox(
+                height: size.height * 1 / 11,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: words.length > 5 ? 5 : words.length,
+                      itemBuilder: (context, index) {
+                        return buildIndicator(index == _currentIndex, size);
+                      }),
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -333,32 +386,32 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildShowmore() {
-    return Container(
-      alignment: Alignment.centerLeft,
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Material(
-          color: AppColors.primaryColor,
-          elevation: 4,
-          borderRadius: BorderRadius.circular(16),
-          child: InkWell(
-            splashColor: AppColors.lightBlue,
-            borderRadius: BorderRadius.circular(16),
-            onTap: () {
-              print('show more');
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => AllWordsPage(words: words)));
-            },
-            child: Container(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                'Show More',
-                style: AppStyles.h5,
-              ),
-            ),
-          )),
-    );
-  }
+  // Widget buildShowmore() {
+  //   return Container(
+  //     alignment: Alignment.centerLeft,
+  //     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+  //     child: Material(
+  //         color: AppColors.primaryColor,
+  //         elevation: 4,
+  //         borderRadius: BorderRadius.circular(16),
+  //         child: InkWell(
+  //           splashColor: AppColors.lightBlue,
+  //           borderRadius: BorderRadius.circular(16),
+  //           onTap: () {
+  //             print('show more');
+  //             Navigator.push(
+  //                 context,
+  //                 MaterialPageRoute(
+  //                     builder: (_) => AllWordsPage(words: words)));
+  //           },
+  //           child: Container(
+  //             padding: EdgeInsets.all(16),
+  //             child: Text(
+  //               'Show More',
+  //               style: AppStyles.h5,
+  //             ),
+  //           ),
+  //         )),
+  //   );
+  // }
 }
