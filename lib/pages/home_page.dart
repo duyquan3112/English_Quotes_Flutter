@@ -6,6 +6,7 @@ import 'package:english_quotes/package/quotes/quote_model.dart';
 import 'package:english_quotes/pages/all_word_page_v2.dart';
 import 'package:english_quotes/pages/all_words_page.dart';
 import 'package:english_quotes/pages/control_page.dart';
+import 'package:english_quotes/pages/fav_words.dart';
 import 'package:english_quotes/values/share_keys.dart';
 import 'package:english_quotes/widgets/app_button.dart';
 import 'package:english_words/english_words.dart';
@@ -30,10 +31,12 @@ class _HomePageState extends State<HomePage> {
   late PageController _pageController;
 
   List<EnglishToday> words = [];
+  List<EnglishToday> allWords = [];
 
   String headerQuote = Quotes().getRandom().content!;
 
   List<int> fixedListRandom({int len = 1, int max = 120, int min = 1}) {
+    //neu cac gia tri bi loi thi se tra ve mang rong
     if (len > max || len < min) {
       return [];
     }
@@ -43,9 +46,11 @@ class _HomePageState extends State<HomePage> {
     Random random = Random();
 
     int count = 1;
+    //tao list co do lon = len
     while (count <= len) {
       int val = random.nextInt(max);
       if (newList.contains(val)) {
+        //lay gia tri index ngau nhien khong trung lap
         continue;
       } else {
         newList.add(val);
@@ -55,18 +60,44 @@ class _HomePageState extends State<HomePage> {
     return newList;
   }
 
+  getAllWords() async {
+    List<String> newList = [];
+    int len = nouns.length;
+    for (var i = 0; i < len; i++) {
+      newList.add(nouns[i]);
+    }
+    setState(() {
+      allWords = newList.map((e) => getQuote(e)).toList();
+    });
+  }
+
+  updateFavorite() async {
+    for (var i = 0; i < words.length; i++) {
+      for (var j = 0; j < allWords.length; j++) {
+        if (allWords[j].noun == words[i].noun) {
+          allWords[j].isFavorite = words[i].isFavorite;
+          print("update fav");
+          continue;
+        }
+      }
+    }
+  }
+
   getEnglishToday() async {
     print('before');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print('after');
-    int len = prefs.getInt(ShareKeys.counter) ?? 5;
+    int len = prefs.getInt(ShareKeys.counter) ??
+        5; // lay gia tri counter tu control page
     List<String> newList = [];
-    List<int> rans = fixedListRandom(len: len, max: nouns.length);
+    List<int> rans = fixedListRandom(len: len, max: allWords.length);
     rans.forEach((index) {
-      newList.add(nouns[index]);
+      //duyet tung index, sau do lay noun tu lib roi add vao newlist
+      newList.add(allWords[index].noun!);
     });
     print('has data');
     setState(() {
+      updateFavorite();
       print('rendered');
       words = newList.map((e) => getQuote(e)).toList();
     });
@@ -87,6 +118,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     _pageController = PageController(viewportFraction: 0.9);
+    getAllWords();
     getEnglishToday();
     super.initState();
   }
@@ -152,8 +184,9 @@ class _HomePageState extends State<HomePage> {
                         : quoteDefault;
 
                     ///return card
+                    /// with animation change page
                     return AnimatedContainer(
-                      duration: const Duration(microseconds: 500),
+                      duration: const Duration(microseconds: 1000),
                       curve: Curves.decelerate,
                       child: Padding(
                         padding: const EdgeInsets.all(8),
@@ -164,14 +197,17 @@ class _HomePageState extends State<HomePage> {
                           child: index >=
                                   5 //set dieu kien de render pageview showmore
                               ? InkWell(
-                                  onTap: () {
-                                    Navigator.push(
+                                  onTap: () async {
+                                    await Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                             builder: (_) =>
                                                 //AllWordsPage(words: words)
                                                 AllWordsPageVer2(
                                                     words: words)));
+                                    setState(() {
+                                      updateFavorite();
+                                    });
                                   },
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(24)),
@@ -345,8 +381,18 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.only(top: 24),
                 child: AppButton(
                     label: 'Favorites',
-                    onTap: () {
-                      print('fav');
+                    onTap: () async {
+                      updateFavorite();
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => FavoriteWords(
+                                    allWords: allWords,
+                                    words: words,
+                                  )));
+                      setState(() {
+                        updateFavorite();
+                      });
                     }),
               ),
               Padding(
